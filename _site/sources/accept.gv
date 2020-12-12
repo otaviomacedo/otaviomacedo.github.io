@@ -1,0 +1,22 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	node [shape = ellipse]; fn input true;
+	node [shape = box]; factory regularLanguageDecider;
+    a [label = "function that\n recognizes a\n regular language" shape = ellipse]
+
+    subgraph cluster {
+		rank = same;
+		style=filled;
+		color=lightgrey;
+		node [style=filled,color=white];
+		fn -> input [label = "accepts"];
+		label = "";
+	}
+
+    fn -> factory;
+    input -> factory;
+    factory -> a;
+    a -> regularLanguageDecider;
+    regularLanguageDecider -> true;
+}
+

@@ -1,0 +1,57 @@
+I"�<script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?
+config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>Structure:</p>
+
+<ul>
+  <li>Introduction etc</li>
+  <li>Brief explanation of the program’s design</li>
+  <li>Mention the need to compute the winner</li>
+  <li>Describe how this should be done using a diagram</li>
+  <li>Show the outcome method and how it relates to the diagram</li>
+  <li>This is fine, but the deeper algebraic connection is lost</li>
+  <li>Discuss:
+    <ul>
+      <li>First of all, both are reduce</li>
+      <li>How product is associative, commutative and idempotent -&gt; semilattice</li>
+      <li>This induces an ordering</li>
+      <li>Every subset has a maximal</li>
+    </ul>
+  </li>
+  <li>Refactor with the maximal</li>
+  <li>Conclusion: not too big of a deal, but it shows how algebraic structures appear everywhere</li>
+</ul>
+
+<hr />
+
+<p>The game is structured into three main abstractions: Board, Game and Player, of which we have two implementations: Computer and User. Conceptually, a game starts with two players and an empty board and unravels it. In other words, it generates a sequence of states (the different board configurations as the game progresses, from beginning to end) corresponding to the alternating moves of the two players.</p>
+
+<p><img src="/assets/ttt-design.png" alt="" /></p>
+
+<p>Let’s focus on the Board. As the name suggests, it describes a configuration of the game’s board, that is, which marks are placed on which positions. For example, a particular instance of Board could have the configuration below:</p>
+
+<!-- ![Image showing a winning configuration]() -->
+
+<p>The main question we want Board to answer is: given this configuration, who is the winner (if any)? We can implement this by applying two consecutive transformations to the data:</p>
+
+<!-- ![Image showing the transformations: blue and green]() -->
+
+<p>In the blue transformation, given a sequence of marks, if they are all equal, we want to output that mark; otherwise, the mark representing the empty cell. In the green transformation, given a sequence of marks, we want to output the first one that we find that is not the empty cell (given the rules of the game, there can be at most one such mark); otherwise, the mark representing the empty cell.</p>
+
+<p>A possible implementation of this process in Scala is:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">lazy</span> <span class="k">val</span> <span class="nv">outcome</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">product</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">GameOutcome</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">GameOutcome</span><span class="o">)</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> 
+    <span class="nf">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="o">)</span> <span class="n">a</span> <span class="k">else</span> <span class="nc">None</span>
+
+  <span class="k">def</span> <span class="nf">winner</span><span class="o">(</span><span class="n">positions</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> 
+    <span class="n">positions</span> <span class="n">map</span> <span class="n">cells</span> <span class="n">reduce</span> <span class="n">product</span>
+
+  <span class="k">val</span> <span class="nv">allLines</span> <span class="k">=</span> <span class="nc">Vector</span><span class="o">(</span><span class="n">rows</span><span class="o">,</span> <span class="n">columns</span><span class="o">,</span> <span class="n">diagonals</span><span class="o">).</span><span class="py">flatten</span>
+  <span class="n">allLines</span> <span class="n">map</span> <span class="n">winner</span> <span class="nf">find</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">isDefined</span><span class="o">)</span> <span class="n">getOrElse</span> <span class="nc">None</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<!-- Briefly talk about the types: GameOutcome, Symbol -->
+
+<p>This is perfectly fine. The function <code class="language-plaintext highlighter-rouge">product</code> corresponds to the blue transformation in our diagram and <code class="language-plaintext highlighter-rouge">find(_.isDefined) getOrElse None</code> corresponds to the green one.</p>
+:ET

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Semilattices in Tic-Tc-Toe | Otavio Macedo</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Semilattices in Tic-Tc-Toe" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/algebra/2020/12/19/semilattices.html" />
+<meta property="og:url" content="http://localhost:4000/algebra/2020/12/19/semilattices.html" />
+<meta property="og:site_name" content="Otavio Macedo" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-19T06:40:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Semilattices in Tic-Tc-Toe" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/algebra/2020/12/19/semilattices.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/algebra/2020/12/19/semilattices.html"},"datePublished":"2020-12-19T06:40:00+00:00","headline":"Semilattices in Tic-Tc-Toe","dateModified":"2020-12-19T06:40:00+00:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Otavio Macedo" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Otavio Macedo</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Semilattices in Tic-Tc-Toe</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-12-19T06:40:00+00:00" itemprop="datePublished">Dec 19, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?
+config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>Structure:</p>
+
+<ul>
+  <li>Introduction etc</li>
+  <li>Brief explanation of the program’s design</li>
+  <li>Mention the need to compute the winner</li>
+  <li>Describe how this should be done using a diagram</li>
+  <li>Show the outcome method and how it relates to the diagram</li>
+  <li>This is fine, but the deeper algebraic connection is lost</li>
+  <li>Discuss:
+    <ul>
+      <li>First of all, both are reduce</li>
+      <li>How product is associative, commutative and idempotent -&gt; semilattice</li>
+      <li>This induces an ordering</li>
+      <li>Every subset has a maximal</li>
+    </ul>
+  </li>
+  <li>Refactor with the maximal</li>
+  <li>Conclusion: not too big of a deal, but it shows how algebraic structures appear everywhere</li>
+</ul>
+
+<hr />
+
+<p>The game is structured into three main abstractions: Board, Game and Player, of which we have two implementations: Computer and User. Conceptually, a game starts with two players and an empty board and unravels it. In other words, it generates a sequence of states (the different board configurations as the game progresses, from beginning to end) corresponding to the alternating moves of the two players.</p>
+
+<p><img src="/assets/ttt-design.png" alt="" /></p>
+
+<p>Let’s focus on the Board. As the name suggests, it describes a configuration of the game’s board, that is, which marks are placed on which positions. For example, a particular instance of Board could have the configuration below:</p>
+
+<!-- ![Image showing a winning configuration]() -->
+
+<p>The main question we want Board to answer is: given this configuration, who is the winner (if any)? We can implement this by applying two consecutive transformations to the data:</p>
+
+<!-- ![Image showing the transformations: blue and green]() -->
+
+<p>In the blue transformation, given a sequence of marks, if they are all equal, we want to output that mark; otherwise, the mark representing the empty cell. In the green transformation, given a sequence of marks, we want to output the first one that we find that is not the empty cell (given the rules of the game, there can be at most one such mark); otherwise, the mark representing the empty cell.</p>
+
+<p>A possible implementation of this process in Scala is:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">lazy</span> <span class="k">val</span> <span class="nv">outcome</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">⊙</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">GameOutcome</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">GameOutcome</span><span class="o">)</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> 
+    <span class="nf">if</span> <span class="o">(</span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="o">)</span> <span class="n">a</span> <span class="k">else</span> <span class="nc">None</span>
+
+  <span class="k">def</span> <span class="nf">winner</span><span class="o">(</span><span class="n">positions</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span><span class="k">:</span> <span class="kt">GameOutcome</span> <span class="o">=</span> 
+    <span class="n">positions</span> <span class="n">map</span> <span class="n">cells</span> <span class="n">reduce</span> <span class="o">⊙</span>
+
+  <span class="k">val</span> <span class="nv">allLines</span> <span class="k">=</span> <span class="nc">Vector</span><span class="o">(</span><span class="n">rows</span><span class="o">,</span> <span class="n">columns</span><span class="o">,</span> <span class="n">diagonals</span><span class="o">).</span><span class="py">flatten</span>
+  <span class="n">allLines</span> <span class="n">map</span> <span class="n">winner</span> <span class="nf">find</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">isDefined</span><span class="o">)</span> <span class="n">getOrElse</span> <span class="nc">None</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<!-- Briefly talk about the types: GameOutcome, Symbol -->
+
+<p>This is perfectly fine. The function <code class="language-plaintext highlighter-rouge">⊙</code> corresponds to the blue transformation in our diagram and <code class="language-plaintext highlighter-rouge">find(_.isDefined) getOrElse None</code> in the last line corresponds to the green one. This is the intuitive notion we have about what should happen and more or less matches the verbal description I’ve given for it. But there is a deeper connection between these two transformations that is lost in this particular implementation.</p>
+
+<p>First off, we use <code class="language-plaintext highlighter-rouge">reduce</code> to go from a sequence of symbols to a single symbol in the blue transformation. It would be satisfyingly symmetrical if we could reframe the green one in term of reduction, as well. So, what would that function look like? With a bit of thought and experimentation, we can quickly arrive at the solution. But I would like to take a detour through the land of Abstract Algebra and Order Theory.</p>
+
+<h2 id="semilattices">Semilattices</h2>
+
+<p>The operation <code class="language-plaintext highlighter-rouge">⊙</code> has three important properties:</p>
+
+<ul>
+  <li><strong>Idempotence</strong>: for any symbol <code class="language-plaintext highlighter-rouge">a</code>, <code class="language-plaintext highlighter-rouge">⊙(a, a) == a</code>.</li>
+  <li><strong>Commutativity</strong>: for any two symbols <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code>, <code class="language-plaintext highlighter-rouge">⊙(a, b) == ⊙(b, a)</code>.</li>
+  <li><strong>Associativity</strong>: for any three symbols <code class="language-plaintext highlighter-rouge">a</code>, <code class="language-plaintext highlighter-rouge">b</code> and <code class="language-plaintext highlighter-rouge">c</code>, <code class="language-plaintext highlighter-rouge">⊙(a, ⊙(b, c)) == ⊙(⊙(a, b), c)</code>.</li>
+</ul>
+
+<p>In Abstract Algebra, sets with an operation that satisfies these three properties is called a semilattice. The interesting thing about a semilattice is that you can use its operation to define a relation ≤ between two elements. Using mathematical notation, this relation is defined as:</p>
+
+<p>\[
+a \odot b = a \iff a \leq b  <br />
+\]</p>
+
+<p>In other words, if I take any two elements \(a\) and \(b\) and compute the result of the operation \(\odot\) between them, the result may be \(a\) or something else. If it’s \(a\), we say that \(a \leq b\). And vice-versa: if, given two elements \(a\) and \(b\), if we know that \(a \leq b\), then we can conclude that \(a ⊙ b = a\). Now, one important caveat is that, given two elements \(a\) and \(b\), it may just happen that neither \(a \leq b\) nor \(b \leq a\) is true. We simply cannot compare them.</p>
+
+<p>Mathematicians say that the operation induces a partial order on the <code class="language-plaintext highlighter-rouge">GameOutcome</code> set. So we have:</p>
+
+<p>\(\texttt{\_} \leq a\)
+\(a \leq a\)</p>
+<ul>
+  <li>
+\[a \leq a\]
+  </li>
+  <li>
+\[a \leq a\]
+  </li>
+  <li>
+\[a \leq a\]
+  </li>
+  <li>
+\[a \leq a\]
+  </li>
+</ul>
+
+  </div><a class="u-url" href="/algebra/2020/12/19/semilattices.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Otavio Macedo</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Otavio Macedo</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/otaviomacedo"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">otaviomacedo</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

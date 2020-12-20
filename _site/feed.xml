@@ -1,28 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-12-19T13:19:45+00:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Otavio Macedo</title><entry><title type="html">Semilattices in Tic-Tc-Toe</title><link href="http://localhost:4000/algebra/2020/12/19/semilattices.html" rel="alternate" type="text/html" title="Semilattices in Tic-Tc-Toe" /><published>2020-12-19T06:40:00+00:00</published><updated>2020-12-19T06:40:00+00:00</updated><id>http://localhost:4000/algebra/2020/12/19/semilattices</id><content type="html" xml:base="http://localhost:4000/algebra/2020/12/19/semilattices.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-12-20T11:06:14+00:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Otavio Macedo</title><entry><title type="html">Semilattices in Tic-Tc-Toe</title><link href="http://localhost:4000/algebra/2020/12/19/semilattices.html" rel="alternate" type="text/html" title="Semilattices in Tic-Tc-Toe" /><published>2020-12-19T06:40:00+00:00</published><updated>2020-12-19T06:40:00+00:00</updated><id>http://localhost:4000/algebra/2020/12/19/semilattices</id><content type="html" xml:base="http://localhost:4000/algebra/2020/12/19/semilattices.html">&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?
 config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;
 
-&lt;p&gt;Structure:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Introduction etc&lt;/li&gt;
-  &lt;li&gt;Brief explanation of the program’s design&lt;/li&gt;
-  &lt;li&gt;Mention the need to compute the winner&lt;/li&gt;
-  &lt;li&gt;Describe how this should be done using a diagram&lt;/li&gt;
-  &lt;li&gt;Show the outcome method and how it relates to the diagram&lt;/li&gt;
-  &lt;li&gt;This is fine, but the deeper algebraic connection is lost&lt;/li&gt;
-  &lt;li&gt;Discuss:
-    &lt;ul&gt;
-      &lt;li&gt;First of all, both are reduce&lt;/li&gt;
-      &lt;li&gt;How product is associative, commutative and idempotent -&amp;gt; semilattice&lt;/li&gt;
-      &lt;li&gt;This induces an ordering&lt;/li&gt;
-      &lt;li&gt;Every subset has a maximal&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Refactor with the maximal&lt;/li&gt;
-  &lt;li&gt;Conclusion: not too big of a deal, but it shows how algebraic structures appear everywhere&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
+&lt;h2 id=&quot;program-design&quot;&gt;Program design&lt;/h2&gt;
 
 &lt;p&gt;The game is structured into three main abstractions: Board, Game and Player, of which we have two implementations: Computer and User. Conceptually, a game starts with two players and an empty board and unravels it. In other words, it generates a sequence of states (the different board configurations as the game progresses, from beginning to end) corresponding to the alternating moves of the two players.&lt;/p&gt;
 
@@ -41,11 +20,11 @@ config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;
 &lt;p&gt;A possible implementation of this process in Scala is:&lt;/p&gt;
 
 &lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;lazy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;outcome&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;⊙&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
     &lt;span class=&quot;nf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;None&lt;/span&gt;
 
   &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;winner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;positions&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Seq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
-    &lt;span class=&quot;n&quot;&gt;positions&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cells&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;⊙&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;positions&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cells&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt;
 
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;allLines&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rows&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diagonals&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;flatten&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;allLines&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;winner&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;find&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;isDefined&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getOrElse&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;None&lt;/span&gt;
@@ -53,46 +32,53 @@ config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;!-- Briefly talk about the types: GameOutcome, Symbol --&gt;
 
-&lt;p&gt;This is perfectly fine. The function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;⊙&lt;/code&gt; corresponds to the blue transformation in our diagram and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;find(_.isDefined) getOrElse None&lt;/code&gt; in the last line corresponds to the green one. This is the intuitive notion we have about what should happen and more or less matches the verbal description I’ve given for it. But there is a deeper connection between these two transformations that is lost in this particular implementation.&lt;/p&gt;
+&lt;p&gt;This is perfectly fine. The function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;product&lt;/code&gt; corresponds to the blue transformation in our diagram and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;find(_.isDefined) getOrElse None&lt;/code&gt; in the last line corresponds to the green one. This is the intuitive notion we have about what should happen and more or less matches the verbal description I’ve given for it. But there is a deeper connection between these two transformations that is lost in this implementation.&lt;/p&gt;
 
 &lt;p&gt;First off, we use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reduce&lt;/code&gt; to go from a sequence of symbols to a single symbol in the blue transformation. It would be satisfyingly symmetrical if we could reframe the green one in term of reduction, as well. So, what would that function look like? With a bit of thought and experimentation, we can quickly arrive at the solution. But I would like to take a detour through the land of Abstract Algebra and Order Theory.&lt;/p&gt;
 
 &lt;h2 id=&quot;semilattices&quot;&gt;Semilattices&lt;/h2&gt;
 
-&lt;p&gt;The operation &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;⊙&lt;/code&gt; has three important properties:&lt;/p&gt;
+&lt;p&gt;The function &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;product&lt;/code&gt; is a lot more interesting than it seems. Before we can take a closer look at it, though, I want to just adopt a different convention for this section, to make the text more readable: I’m replacing the name &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;product&lt;/code&gt; with the symbol \(\ast\) and, whenever you see \(a \ast b\), translate it in your mind to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;product(a, b)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Ok, so the operation \(\ast\) has three noteworthy properties:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Idempotence&lt;/strong&gt;: for any symbol &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;a&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;⊙(a, a) == a&lt;/code&gt;.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Commutativity&lt;/strong&gt;: for any two symbols &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;b&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;⊙(a, b) == ⊙(b, a)&lt;/code&gt;.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Associativity&lt;/strong&gt;: for any three symbols &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;a&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;b&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;⊙(a, ⊙(b, c)) == ⊙(⊙(a, b), c)&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Idempotence&lt;/strong&gt;: \(a \ast a = a\) for any symbol \(a\). This is the very reason we created this function.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Commutativity&lt;/strong&gt;: \(a \ast b = b \ast a\) for any two symbols \(a\) and \(b\).&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Associativity&lt;/strong&gt;:  \((a \ast b) \ast c = a \ast (b \ast c)\) for any three symbols \(a\), \(b\) and \(c\).&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;In Abstract Algebra, sets with an operation that satisfies these three properties is called a semilattice. The interesting thing about a semilattice is that you can use its operation to define a relation ≤ between two elements. Using mathematical notation, this relation is defined as:&lt;/p&gt;
+&lt;p&gt;In Abstract Algebra, a set with an operation that satisfies these three properties form a structure called &lt;em&gt;semilattice&lt;/em&gt;. The interesting thing about a semilattice is that they can be looked at from two different perspectives: as a set with an operation, as we just saw, or as a &lt;em&gt;partially ordered set&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;\[
-a \odot b = a \iff a \leq b  &lt;br /&gt;
-\]&lt;/p&gt;
+&lt;p&gt;To understand what this means, consider all the possible pairs of symbols. There are \(3\) different symbols, so \(3^2 = 9\) combinations. Out of these \(9\) pairs, let’s keep only those in which the product of the two elements is equal to the first one. For example, the pair \((\epsilon, {\normalsize\texttt{o}})\) satisfies this condition because \(\epsilon \ast {\normalsize\texttt{o}} = \epsilon\), whereas \(({\normalsize\texttt{o}}, \epsilon)\) and \((\times, {\normalsize\texttt{o}})\) don’t. If a given pair \((a, b)\) satisfies this condition, we say that \(a \leq b\).&lt;/p&gt;
 
-&lt;p&gt;In other words, if I take any two elements \(a\) and \(b\) and compute the result of the operation \(\odot\) between them, the result may be \(a\) or something else. If it’s \(a\), we say that \(a \leq b\). And vice-versa: if, given two elements \(a\) and \(b\), if we know that \(a \leq b\), then we can conclude that \(a ⊙ b = a\). Now, one important caveat is that, given two elements \(a\) and \(b\), it may just happen that neither \(a \leq b\) nor \(b \leq a\) is true. We simply cannot compare them.&lt;/p&gt;
+&lt;p&gt;So, starting from the semilattice operation, we defined what “less than or equal to” means. And, if we know that \(a \leq b\), and we had to put them in order, \(a\) would come first. So, the “ordered” part is clear. In what sense, then, is it “partially” ordered? This refers to the fact that some pairs of elements cannot be compared this way. For example, neither \(\times \leq {\normalsize\texttt{o}}\) nor \({\normalsize\texttt{o}} \leq \times\) is true.&lt;/p&gt;
 
-&lt;p&gt;Mathematicians say that the operation induces a partial order on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GameOutcome&lt;/code&gt; set. So we have:&lt;/p&gt;
+&lt;p&gt;One of the logical consequences of this particular partial order (we could have a different order had we started with a different operation) is that \(\epsilon \leq a\) for any symbol \(a\). And this fact, in turn, implies that \(\times\) and \({\normalsize\texttt{o}}\) are not less than or equal to any other symbol. (Note how I carefully avoided saying “greater than”.) Elements which are not less than or equal to any other are called &lt;em&gt;maximal elements&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;\(\texttt{\_} \leq a\)
-\(a \leq a\)&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-\[a \leq a\]
-  &lt;/li&gt;
-  &lt;li&gt;
-\[a \leq a\]
-  &lt;/li&gt;
-  &lt;li&gt;
-\[a \leq a\]
-  &lt;/li&gt;
-  &lt;li&gt;
-\[a \leq a\]
-  &lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><category term="algebra" /><summary type="html"></summary></entry><entry><title type="html">Functions and Regular Expressions</title><link href="http://localhost:4000/decidability/2020/12/11/regex.html" rel="alternate" type="text/html" title="Functions and Regular Expressions" /><published>2020-12-11T13:40:00+00:00</published><updated>2020-12-11T13:40:00+00:00</updated><id>http://localhost:4000/decidability/2020/12/11/regex</id><content type="html" xml:base="http://localhost:4000/decidability/2020/12/11/regex.html">Regular expressions are one of those things that bring joy and frustration at the same time to most software developers. At one point or another, we've all written functions to match strings against some regular expression, as part of a bigger function, class, component etc. In this post, I want to show you one of the counterintuitive results from Computability Theory, that involves regular expressions. The code samples are all in Scala, mainly because, in my opinion, it is concise in many respects, but, at the same time, reasonably familiar to a wide audience of developers.
+&lt;h2 id=&quot;back-to-code&quot;&gt;Back to code&lt;/h2&gt;
+
+&lt;p&gt;Previously we were looking for a defined element in a sequence and, if we didn’t find any, we would return &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt;. Now we can redefine this rule in terms of finding a maximal element. If there is any defined element in the sequence (either \(\times\) or \({\normalsize\texttt{o}}\)), it is a maximal element. Any one will do for this application. If no element is defined (i.e., all we have is a bunch of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt;s), then &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt; is the maximal.&lt;/p&gt;
+
+&lt;p&gt;With this new definition in mind we can refactor the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;outcome&lt;/code&gt; function, so that both transformations are implemented as some sort of reduction:&lt;/p&gt;
+
+&lt;div class=&quot;language-scala highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;lazy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;outcome&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
+    &lt;span class=&quot;nf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;None&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;maximal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
+    &lt;span class=&quot;nf&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;winner&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;positions&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Seq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;GameOutcome&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;positions&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cells&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;product&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;allLines&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rows&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;diagonals&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;flatten&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;allLines&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;winner&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reduce&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maximal&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;!-- TODO Make this statement stronger and more interesting --&gt;
+&lt;p&gt;Of course, if this was a real world application, I wouldn’t do this refactoring. The previous version communicates intent much better, even if we lose some symmetry. But this example shows just how often abstract algebraic structures like semilattices appear everywehere.&lt;/p&gt;</content><author><name></name></author><category term="algebra" /><summary type="html"></summary></entry><entry><title type="html">Functions and Regular Expressions</title><link href="http://localhost:4000/decidability/2020/12/11/regex.html" rel="alternate" type="text/html" title="Functions and Regular Expressions" /><published>2020-12-11T13:40:00+00:00</published><updated>2020-12-11T13:40:00+00:00</updated><id>http://localhost:4000/decidability/2020/12/11/regex</id><content type="html" xml:base="http://localhost:4000/decidability/2020/12/11/regex.html">Regular expressions are one of those things that bring joy and frustration at the same time to most software developers. At one point or another, we've all written functions to match strings against some regular expression, as part of a bigger function, class, component etc. In this post, I want to show you one of the counterintuitive results from Computability Theory, that involves regular expressions. The code samples are all in Scala, mainly because, in my opinion, it is concise in many respects, but, at the same time, reasonably familiar to a wide audience of developers.
 
 ## Terminology
 
@@ -241,7 +227,8 @@ class UniversalDecider(factory: Factory) extends ((String =&gt; Boolean, String)
 }
 ``` 
 
-We are now injecting the factory into `UniversalDecider`'s constructor. It's easier to understand what's going on here by looking at it graphically. We can group our three test cases into two scenarios:
+We are now injecting the factory into `UniversalDecider`'s constructor. It's easier to understand what's going on here by looking at it graphically. We can group our three test cases into two 
+scenarios:
 
 ![Function accepts the input string](/assets/accept.svg)
 

@@ -6,21 +6,33 @@ categories: algebra
 ---
 {% include mathjax.html %} 
 
+<style type="text/css">
+.center-image
+{
+    margin: 0 auto;
+    display: block;
+}
+.wide { width: 100%; height: auto; }
+</style>
+
+Introduction bla bla bla
+
 ## Program design
 
-The game is structured into three main abstractions: Board, Game and Player, of which we have two implementations: Computer and User. Conceptually, a game starts with two players and an empty board and unravels it. In other words, it generates a sequence of states (the different board configurations as the game progresses, from beginning to end) corresponding to the alternating moves of the two players.
+The program consists of three main abstractions: the Player, which, as the name suggests, represents the players of the game, with two concrete implementations: User and Computer. User captures input from a human player while Computer implements the minimax algorithm to decide the best move. Board represents the state of the game at any given point (which marks are placed on which cells). And Game is responsible for controlling the flow of the game from beginning to end, alternately giving the turn to each player. 
 
-![](/assets/ttt-design.png)
+![](/assets/tictactoe/class-diagram.svg){: .center-image }
 
-Let's focus on the Board. As the name suggests, it describes a configuration of the game's board, that is, which marks are placed on which positions. For example, a particular instance of Board could have the configuration below:
+In good functional programming style, everything is immutable, so Game doesn't mutate the boards but, instead, unravels a game history, i.e., produces a sequence of states in which each state is a different instance of Board. This sequence ends in a full board or in a state in which one of the players has won. So it's important to tell, of a given Board, whether there is a winner and who it is. Let's say the game reached this state:
 
-<!-- ![Image showing a winning configuration]() -->
+![](/assets/tictactoe/board.png){: .center-image }
 
-The main question we want Board to answer is: given this configuration, who is the winner (if any)? We can implement this by applying two consecutive transformations to the data:
+In this configuration, player X has completed the third row with its mark, so this is a final state in the game's history and X is the winner. 
 
-<!-- ![Image showing the transformations: blue and green]() -->
 
-In the blue transformation, given a sequence of marks, if they are all equal, we want to output that mark; otherwise, the mark representing the empty cell. In the green transformation, given a sequence of marks, we want to output the first one that we find that is not the empty cell (given the rules of the game, there can be at most one such mark); otherwise, the mark representing the empty cell.
+![](/assets/tictactoe/reductions.svg){: .center-image .wide}
+
+The transformation represented by the blue arrows generates the winner of each line (row, column or diagonal), that is, the symbol that appears three times in the line (or $$\Large␣$$ if there is no such symbol). The transformation represented by the orange arrows generates the first non-empty symbol found in the sequence; otherwise, it generates $$\Large␣$$. 
 
 A possible implementation of this process in Scala is:
 
@@ -32,15 +44,14 @@ lazy val outcome: GameOutcome = {
   def winner(positions: Seq[Int]): GameOutcome = 
     positions map cells reduce product
 
-  val allLines = Vector(rows, columns, diagonals).flatten
-  allLines map winner find(_.isDefined) getOrElse None
+  (rows ++ columns ++ diagonals) map winner find(_.isDefined) getOrElse None
 }
 ```
 <!-- Briefly talk about the types: GameOutcome, Symbol -->
 
-This is perfectly fine. The function `product` corresponds to the blue transformation in our diagram and `find(_.isDefined) getOrElse None` in the last line corresponds to the green one. This is the intuitive notion we have about what should happen and more or less matches the verbal description I've given for it. But there is a deeper connection between these two transformations that is lost in this implementation.
+The function `product` corresponds to the blue transformation in our diagram and `find(_.isDefined) getOrElse None`, in the last line, corresponds to the orange one. This is the intuitive notion we have about what should happen and more or less matches the verbal description I've given for it. This is perfectly fine, but there is a deeper connection between these two transformations that is lost in this implementation.
 
-First off, we use `reduce` to go from a sequence of symbols to a single symbol in the blue transformation. It would be satisfyingly symmetrical if we could reframe the green one in term of reduction, as well. So, what would that function look like? With a bit of thought and experimentation, we can quickly arrive at the solution. But I would like to take a detour through the land of Abstract Algebra and Order Theory.
+Observe how we use `reduce` to go from a sequence of symbols to a single symbol in the blue transformation. It would be satisfyingly symmetrical if we could reframe the orange one in term of another reduction. So, what would that function look like? With a bit of thought and experimentation, we can quickly arrive at the solution. But I would like to take a detour through the land of Abstract Algebra and Order Theory.
 
 ## Semilattices
 
@@ -78,8 +89,7 @@ lazy val outcome: GameOutcome = {
   def winner(positions: Seq[Int]): GameOutcome = 
     positions map cells reduce product
 
-  val allLines = Vector(rows, columns, diagonals).flatten
-  allLines map winner reduce maximal
+  (rows ++ columns ++ diagonals) map winner reduce maximal
 }
 ```
 

@@ -1,15 +1,15 @@
 ---
 layout: post
 title:  "Does this function accept itself?"
-date:   2021-02-17 19:45:00 +0000
+date:   2021-03-01 16:24:00 +0000
 categories: decidability
 ---
 
 
 <!-- This paragraph is confusing. Rewrite it. -->
-In the [previous post][regex], I showed why it's impossible to implement a function that tells whether another function recognizes a regular expression. And the short answer was: because it would imply that another thing is possible: to tell, given a function and a string, whether the function accepts the string. I ended the post mentioning that the latter is also impossible. In this post, I will explain why.
+In the [previous post][regex], I started by posing a question: is it possible to implement some algorithm that can tell whether a function accepts a regular expression? And the conclusion was that, if it were possible, there is another thing that would also be possible: to tell whether any given function accepts any given string. This is what we called a "universal decider". I ended by mentioning that the universal decider was impossible to build (and therefore the regular expression decider). In this post I'll show why. 
 
-As in the previous post, we are only considering predicates (functions from `String` to `Boolean`). Let's look at one of the examples again:
+As before, we are only considering predicates (functions from `String` to `Boolean`). Let's look at one of the examples again:
 
 ```scala
 object zerosAtTheEdges extends (String => Boolean) {
@@ -26,13 +26,13 @@ val res0: Boolean = true
 scala> universalDecider(zerosAtTheEdges, "11")
 val res1: Boolean = false
 
-scala> universalDecider(zerosAtTheEdges, "a random string")
+scala> universalDecider(zerosAtTheEdges, "some random string")
 val res2: Boolean = false
 ```
 
 ## Function psychology
 
-Now that we have our universal decider, we can use it as a building block to solve larger problems. Remember that all our functions map strings to booleans. Given that any function can be represented by a string (after all, this what source code is), it is a legal move to pass the source code of a function to any function. More interestingly, we can pass the source code of a function to itself! For example, consider this piece of code:
+Now that we have our universal decider, we can use it as a building block to solve larger problems. Remember that all our functions map strings to booleans. Given that any function can be represented by a string (after all, this what source code is), it is a legal move to pass the source code of a function to any other function. More interestingly, though, we can pass the source code of a function to itself! For example:
 
 ```scala
 val serialized = """object zerosAtTheEdges extends (String => Boolean) {
@@ -42,15 +42,15 @@ val serialized = """object zerosAtTheEdges extends (String => Boolean) {
 println(zerosAtTheEdges(serialized))
 ```
 
-We are passing the source code of `zerosAtTheEdges` to `zerosAtTheEdges` and printing the result. Evidently, this will print "false", because a piece of Scala code does not match the regular expression "01*0". Now suppose we wrote a function (in Scala) that validates Scala code. What would happen? The source code of the validator is a valid piece of Scala code. The validator, by definition, accepts any valid Scala code as input. Therefore, unlike `zerosAtTheEdges`, the validator is a function that accepts its own source code as input.
+Here we are passing the source code of `zerosAtTheEdges` to `zerosAtTheEdges` and printing the result. Evidently, this will print "false", because a piece of Scala code does not match the regular expression "01*0". Now suppose we wrote a function, in Scala, that validates Scala code. What would happen? The source code of the validator is a valid piece of Scala code. The validator, by definition, accepts any valid Scala code as input. Therefore, unlike `zerosAtTheEdges`, the validator is a function that accepts its own source code as input.
 
 So the problem we are interested in is to tell how a function would react when faced with its own source code; will it accept that string or not? So what we want is to implement a function with this signature:
 
 ```scala
-def isSelfLoathing(sourceCode: String): Boolean = ???
+def isSelfLoathing(code: String): Boolean = ???
 ```
 
-This is what we want from `isSelfLoathing`: you pass some source code to it. The function that this source code compiles to may or may not accept its own source code as input. If it does not, we will say that the function loathes itself. It can't bear to look at its own image in the mirror and may return false or go into a spiral of existential angst and loop forever, never to return to the society of functions again! In that case, `isSelfLoathing` gives the right diagnosis: true (i.e., the fuction loathes itself). If, on the other hand, the function has no self-image problems and accepts its own source code as input, `isSelfLoathing` returns false. This is the contract we expect the function to satisfy.
+This is what we want from `isSelfLoathing`: you pass the source code of some function to it. That function may or may not accept its own source code as input. If it does not, we will say that the function loathes itself. It can't bear to look at its own image in the mirror and may reject it or go into a spiral of existential angst and loop forever, never to return to the society of functions again! In that case, the diagnosis that `isSelfLoathing` should give is `true` (i.e., the function loathes itself). If, on the other hand, the function has no self-image problems and accepts its own source code as input, `isSelfLoathing` should return `false`. This is the contract we expect the function to satisfy.
 
 ## Implementation
 
@@ -62,17 +62,15 @@ def compile(sourceCode: String): (String => Boolean) = ???
 def serialize(fn: String => Boolean): String = ???
 ```
 
-`compile`, as the name suggests, takes a string that contains some source code and compiles that code to produce a function. `serialize` does the opposite: given a function, it generates its corresponding source code.
-
-This is what it looks like:
+`compile`, as the name suggests, takes a string that contains some source code and compiles that code to produce a function. `serialize` does the opposite: given a function, it generates its corresponding source code. Having these auxiliary functions in place, this is what our implementation would look like:
 
 ```scala
 // Assuming sourceCode is a well formed piece of Scala code
-def isSelfLoathing(sourceCode: String): Boolean =
-  !universalDecider(compile(sourceCode), sourceCode)
+def isSelfLoathing(code: String): Boolean =
+  !universalDecider(compile(code), code)
 ```
 
-Pretty straightforward. We compile the source code, pass the compiled and the source to the universal decider and return the negation of that. And we can verify that this works with some unit tests:
+Pretty straightforward. We pass the function and its source code to the universal decider and return the negation of that. And we could verify that this works by writing some unit tests:
 
 ```scala
 class SelfLoathingTest extends AnyFunSuite {
@@ -94,19 +92,15 @@ isSelfLoathing(serialize(isSelfLoathing))
 
 ## Contract revisited
 
-It's not self-evident what we should expect in the edge case in which `isSelfLoathing` is diagnosing itself. In order to reason more systematically about this, we need to formalize the contract we have described only informally so far. One way to do this is to create what mathematicians call an _axiomatic system_, that is, a set of base rules, which we take for granted (the _axioms_), and derive logical consequences from there.
+It's not self-evident what we should expect in the edge case in which `isSelfLoathing` is diagnosing itself. In order to reason more systematically about this, we need to formalize the contract we have described only informally so far. One way to do this is to create what mathematicians call an _axiomatic system_, that is, a set of simple statements (the _axioms_), which we just take to be true. From there we can derive more interesting facts using logical reasoning.
 
 
 **Axiom 1.**
 ```scala
-isSelfLoathing(code) == true
-
-// if, and only if:
-
-compile(code)(code) == ⊥
+isSelfLoathing(code) == true /* if, and only if, */ compile(code)(code) == ⊥
 ```
 
-For conciseness, I'm abusing the Scala notation a bit here. The symbol `⊥` denotes that the function either returns false or loops forever. What this axiom is saying is that `isSelfLoathing` should return true exactly when the function does not accept its own code as input. This is precisely the formalization we needed. But we still need a second axiom.
+For conciseness, I'm abusing the Scala notation a bit here. The symbol `⊥` here denotes that the function either returns false or loops forever. What this axiom is saying is that `isSelfLoathing` should return true exactly when the function does not accept its own code as input. This is precisely the formalization we needed. But we still need a second axiom.
 
 
 **Axiom 2.**
@@ -119,7 +113,7 @@ In other words, if you take any function `fn`, serialize it and compile it again
 
 ## Addressing the edge case
 
-Back to the edge case, there are only two options, of course: true and false. Let's assume it should be true. Going back to our contract and using Axiom 1, we get that:
+Back to the edge case, there are only two options, of course: true and false. Let's assume it should be true. Going back to our contract, and using Axiom 1, we get that:
 
 ```scala
 isSelfLoathing(serialize(isSelfLoathing)) == true // (1)
@@ -131,7 +125,7 @@ implies that:
 compile(serialize(isSelfLoathing))(serialize(isSelfLoathing)) == ⊥
 ```
 
-This looks complicated, but it's nothing more than a purely mechanical substitution of symbols. Wherever we see `code` in Axiom 1, we are replacing it with `serialize(isSelfLoathing)` here. The axiom is generic and applies to everything that you could reasonably regard as `code`. This edge case is just a particular application of it.
+This looks complicated, but it's nothing more than a purely mechanical substitution of symbols. Just as we can use equations to reason about numbers, matrices etc, we can also apply equational reasoning to code, as long as we are dealing only with pure functions and immutable values. Wherever we see `fn` in Axiom 1, we are replacing it with `isSelfLoathing` here. The axiom is generic and applies to any function. This edge case is just a particular application of it.
 
 By Axiom 2, we know that `compile` is the inverse of `serialize`. As such, they cancel each other out, allowing us to simplify the equation above to:
 
